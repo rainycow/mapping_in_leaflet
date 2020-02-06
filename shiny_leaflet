@@ -1,0 +1,43 @@
+
+library(leaflet)
+library(shiny)
+library(htmlwidgets)
+
+
+ui <- fluidPage(
+
+           leafletOutput("mymap", height = '1000px')
+      
+    )
+  
+server <- function(input, output, session) {
+  
+  output$mymap <- renderLeaflet({
+    
+  m = leaflet() %>%
+  setView(lng = 103.80775, lat = 1.364579, zoom = 12) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolylines(data = shapeData, color="green", weight = 1) %>%
+  addPolygons(data = shapeData, color = pal(shapeData$cases), weight = 0.1,
+              highlight = highlightOptions(
+                weight = 3,
+                fillOpacity = 0,
+                color = "black",
+                opacity = 1.0,
+                bringToFront = TRUE,
+                sendToBack = TRUE),
+              label = labels,
+              labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto")) 
+  m %>% addLabelOnlyMarkers(data=red_cases,
+                      lng=red_cases$Longitude, lat=red_cases$Latitude,
+                      label=case_labels,
+                      clusterOptions = markerClusterOptions(),
+                      labelOptions = labelOptions(noHide = T,
+                                                  direction = 'auto'))
+                                                  
+  })
+}
+
